@@ -280,7 +280,7 @@ function updateSyncStatus(message, isError = false) {
 }
 
 // Function to fetch quotes from JSONPlaceholder
-async function fetchQuotesFromServer() {
+async function syncQuotes() {
     try {
         updateSyncStatus('Syncing with server...');
         const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
@@ -384,11 +384,11 @@ function startPeriodicFetch(intervalSeconds = 30) {
     }
     
     // Fetch immediately on start
-    fetchQuotesFromServer();
+    syncQuotes();
     
     // Set up periodic fetching
     fetchInterval = setInterval(() => {
-        fetchQuotesFromServer();
+        syncQuotes();
     }, intervalSeconds * 1000);
     
     console.log(`Periodic fetching started (every ${intervalSeconds} seconds)`);
@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
     populateCategories();
     
     // Fetch quotes from server on initialization
-    fetchQuotesFromServer().then(() => {
+    syncQuotes().then(() => {
         // Display initial random quote after server sync
         showRandomQuote();
     });
