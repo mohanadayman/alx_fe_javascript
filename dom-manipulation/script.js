@@ -299,7 +299,7 @@ async function fetchQuotesFromServer() {
         
         const lastFetchDate = new Date(fetchTime);
         syncQuotes(`Last synced: ${lastFetchDate.toLocaleTimeString()}`);
-        console.log('Quotes fetched and synchronized from server');
+        console.log('Quotes synced with server!');
         return serverQuotes;
     } catch (error) {
         syncQuotes('Sync failed. Check console for details.', true);
