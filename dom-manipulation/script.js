@@ -27,6 +27,52 @@ function loadQuotes() {
     }
 }
 
+// Variable to track current filter
+let currentFilter = 'all';
+
+// Function to save selected category filter to local storage
+function saveCategoryFilter() {
+    localStorage.setItem('selectedCategoryFilter', currentFilter);
+}
+
+// Function to load selected category filter from local storage
+function loadCategoryFilter() {
+    const savedFilter = localStorage.getItem('selectedCategoryFilter');
+    if (savedFilter) {
+        currentFilter = savedFilter;
+    }
+}
+
+// Function to populate categories dropdown
+function populateCategories() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    
+    // Extract unique categories from quotes array
+    const categories = [...new Set(quotes.map(quote => quote.category))].sort();
+    
+    // Clear existing options except "All Categories"
+    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+    
+    // Add each unique category as an option
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+    
+    // Restore saved filter selection
+    categoryFilter.value = currentFilter;
+}
+
+// Function to filter quotes based on selected category
+function filterQuotes() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    currentFilter = categoryFilter.value;
+    saveCategoryFilter();
+    showRandomQuote();
+}
+
 // Function to display a random quote
 function showRandomQuote() {
     const quoteDisplay = document.getElementById('quoteDisplay');
@@ -34,16 +80,26 @@ function showRandomQuote() {
     // Clear previous content
     quoteDisplay.innerHTML = '';
     
-    if (quotes.length === 0) {
+    // Filter quotes based on selected category
+    let filteredQuotes = quotes;
+    if (currentFilter !== 'all') {
+        filteredQuotes = quotes.filter(quote => quote.category === currentFilter);
+    }
+    
+    if (filteredQuotes.length === 0) {
         const noQuoteMsg = document.createElement('p');
-        noQuoteMsg.textContent = 'No quotes available. Please add a quote first.';
+        if (quotes.length === 0) {
+            noQuoteMsg.textContent = 'No quotes available. Please add a quote first.';
+        } else {
+            noQuoteMsg.textContent = `No quotes available in the "${currentFilter}" category.`;
+        }
         quoteDisplay.appendChild(noQuoteMsg);
         return;
     }
     
-    // Get a random quote
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const randomQuote = quotes[randomIndex];
+    // Get a random quote from filtered quotes
+    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+    const randomQuote = filteredQuotes[randomIndex];
     
     // Create quote container
     const quoteContainer = document.createElement('div');
@@ -127,11 +183,19 @@ function addQuote() {
         category: category
     };
     
+    // Check if this is a new category
+    const isNewCategory = !quotes.some(quote => quote.category.toLowerCase() === category.toLowerCase());
+    
     // Add quote to the array
     quotes.push(newQuote);
     
     // Save quotes to local storage
     saveQuotes();
+    
+    // Update categories dropdown if new category was added
+    if (isNewCategory) {
+        populateCategories();
+    }
     
     // Clear the form
     quoteTextInput.value = '';
@@ -165,6 +229,7 @@ function importFromJsonFile(event) {
             const importedQuotes = JSON.parse(event.target.result);
             quotes.push(...importedQuotes);
             saveQuotes();
+            populateCategories();
             showRandomQuote();
             alert('Quotes imported successfully!');
         } catch (e) {
@@ -179,6 +244,12 @@ function importFromJsonFile(event) {
 document.addEventListener('DOMContentLoaded', function() {
     // Load quotes from local storage
     loadQuotes();
+    
+    // Load saved category filter
+    loadCategoryFilter();
+    
+    // Populate categories dropdown
+    populateCategories();
     
     // Display initial random quote
     showRandomQuote();
