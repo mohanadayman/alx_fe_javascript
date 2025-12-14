@@ -14,8 +14,13 @@ const quotes = [
 function showRandomQuote() {
     const quoteDisplay = document.getElementById('quoteDisplay');
     
+    // Clear previous content
+    quoteDisplay.innerHTML = '';
+    
     if (quotes.length === 0) {
-        quoteDisplay.innerHTML = '<p>No quotes available. Please add a quote first.</p>';
+        const noQuoteMsg = document.createElement('p');
+        noQuoteMsg.textContent = 'No quotes available. Please add a quote first.';
+        quoteDisplay.appendChild(noQuoteMsg);
         return;
     }
     
@@ -23,13 +28,26 @@ function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
     
-    // Update the DOM with the random quote
-    quoteDisplay.innerHTML = `
-        <div class="quote-container">
-            <p class="quote-text">"${randomQuote.text}"</p>
-            <p class="quote-category">— ${randomQuote.category}</p>
-        </div>
-    `;
+    // Create quote container
+    const quoteContainer = document.createElement('div');
+    quoteContainer.className = 'quote-container';
+    
+    // Create quote text element
+    const quoteText = document.createElement('p');
+    quoteText.className = 'quote-text';
+    quoteText.textContent = `"${randomQuote.text}"`;
+    
+    // Create quote category element
+    const quoteCategory = document.createElement('p');
+    quoteCategory.className = 'quote-category';
+    quoteCategory.textContent = `— ${randomQuote.category}`;
+    
+    // Append elements to container
+    quoteContainer.appendChild(quoteText);
+    quoteContainer.appendChild(quoteCategory);
+    
+    // Append container to display
+    quoteDisplay.appendChild(quoteContainer);
 }
 
 // Function to create and display the add quote form
