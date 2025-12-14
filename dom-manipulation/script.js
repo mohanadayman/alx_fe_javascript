@@ -271,7 +271,7 @@ function convertPostsToQuotes(posts) {
 }
 
 // Function to update sync status display
-function updateSyncStatus(message, isError = false) {
+function syncQuotes(message, isError = false) {
     const syncStatus = document.getElementById('syncStatus');
     if (syncStatus) {
         syncStatus.textContent = message;
@@ -282,7 +282,7 @@ function updateSyncStatus(message, isError = false) {
 // Function to fetch quotes from JSONPlaceholder
 async function fetchQuotesFromServer() {
     try {
-        updateSyncStatus('Syncing with server...');
+        syncQuotes('Syncing with server...');
         const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
         if (!response.ok) {
             throw new Error('Failed to fetch quotes from server');
@@ -298,11 +298,11 @@ async function fetchQuotesFromServer() {
         localStorage.setItem('lastServerFetch', fetchTime.toString());
         
         const lastFetchDate = new Date(fetchTime);
-        updateSyncStatus(`Last synced: ${lastFetchDate.toLocaleTimeString()}`);
+        syncQuotes(`Last synced: ${lastFetchDate.toLocaleTimeString()}`);
         console.log('Quotes fetched and synchronized from server');
         return serverQuotes;
     } catch (error) {
-        updateSyncStatus('Sync failed. Check console for details.', true);
+        syncQuotes('Sync failed. Check console for details.', true);
         console.error('Error fetching quotes from server:', error);
         return [];
     }
